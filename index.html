@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Giphy Home Work</title> 
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://ma
+          xcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="row">
+          <div class="col-lg-12">
+             <div id="buttons">
+                 <button data-person="derek jeter">Derek</button>
+                 <button data-person="thurman munson">Thurman</button> 
+                 <button data-person="reggie jackson">Reggie</button>
+                 <button data-person="ken griffey">Griff</button>
+                 <button data-person="cal ripken">Cal</button>
+             </div>
+           </div>  
+        </div>
+
+        <div class="row">
+            <div class="col-lg-9">
+                <div id="gifs-appear-here">
+                </div>
+            </div>
+
+
+             <div class="col-lg-3">
+                         <form action="/action_page.php">
+                             Add a Baseball Player:<br>
+                            <input type="text" name="" value="">
+                            
+                            <br><br>
+                            <input type="submit" value="Submit">
+                         </form> 
+             </div>
+        </div>
+
+</div>
+
+          <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+          <script type="text/javascript">
+            $("button").on("click", function() {
+              //below..this refers to the element that is clicked...we pulled the attribute data-person out
+              var person = $(this).attr("data-person");
+              //limit=10 limits it to 10 pics
+              var queryURL = "http://api.giphy.com/v1/gifs/search?q=" +
+                person + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+              $.ajax({
+                  url: queryURL,
+                  method: "GET"
+                })
+                .done(function(response) {
+                  var results = response.data;
+
+                  for (var i = 0; i < results.length; i++) {
+                    var gifDiv = $("<div class='item'>"); //
+
+                    var rating = results[i].rating;
+
+                    var p = $("<p>").text("Rating: " + rating);
+
+                    var personImage = $("<img>");
+                    personImage.attr("src", results[i].images.fixed_height.url);
+
+                      //prepend p tag and image to oridinal
+                    gifDiv.prepend(p);
+                    gifDiv.prepend(personImage);
+
+                    $("#gifs-appear-here").prepend(gifDiv);
+                  }
+                });
+            });
+          </script>
+          </div>
+</body>
+</html>
