@@ -5,55 +5,69 @@
   <meta charset="utf-8">
   <title>Giphy Home Work</title> 
 
+        
+
         <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://ma
-          xcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        
 
         <!-- jQuery library -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
         <!-- Latest compiled JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
 
-    <div class="container">
+  <div class="container-fluid">
 
         <div class="row">
-          <div class="col-lg-12">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
              <div id="buttons">
+                <!-- <div class="btn-toolbar"> -->
                  <button data-person="derek jeter">Derek</button>
                  <button data-person="thurman munson">Thurman</button> 
                  <button data-person="reggie jackson">Reggie</button>
                  <button data-person="ken griffey">Griff</button>
                  <button data-person="cal ripken">Cal</button>
+                 <button data-person="barry bonds">Barry</button>
+                 <button data-person="randy johnson">Randy</button> 
+                 <button data-person="pedro martinez">Pedro</button>
+                 <button data-person="babe ruth">BABE</button>
+                 <button data-person="mickey mantle">Mick</button>
+                <!-- </div> -->
              </div>
            </div>  
         </div>
+
 
         <div class="row">
             <div class="col-lg-9">
                 <div id="gifs-appear-here">
                 </div>
-            </div>
-
-
+            </div>            
+             <div class="clearfix visible-xs"></div>
              <div class="col-lg-3">
-                         <form action="/action_page.php">
+                         <form>
                              Add a Baseball Player:<br>
-                            <input type="text" name="" value="">
+                            <input id="text" type="text" name="" value="">
                             
                             <br><br>
-                            <input type="submit" value="Submit">
+                            <input id="submit" type="submit" value="Submit">
                          </form> 
              </div>
         </div>
 
-</div>
+  </div>
 
           <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
           <script type="text/javascript">
+
+         var gifs = []
+         var stills = []
             $("button").on("click", function() {
               //below..this refers to the element that is clicked...we pulled the attribute data-person out
               var person = $(this).attr("data-person");
@@ -67,25 +81,107 @@
                 })
                 .done(function(response) {
                   var results = response.data;
+                  console.log(results);
+                  $("#gifs-appear-here").empty();
+                  stills = [];
+                  gifs = [];
 
                   for (var i = 0; i < results.length; i++) {
-                    var gifDiv = $("<div class='item'>"); //
+                      // Array.push(newItem) ---> push a newItem onto the end of Array
+                      stills.push(results[i].images.original_still.url);
+                      gifs.push(results[i].images.fixed_height.url);
+                    var gifDiv = $("<div class='item' data-state='still'>"); //
 
                     var rating = results[i].rating;
 
                     var p = $("<p>").text("Rating: " + rating);
 
                     var personImage = $("<img>");
-                    personImage.attr("src", results[i].images.fixed_height.url);
-
+                   // personImage.attr("src", results[i].images.fixed_height.url);
+                    personImage.attr("src", results[i].images.original_still.url);
                       //prepend p tag and image to oridinal
                     gifDiv.prepend(p);
                     gifDiv.prepend(personImage);
+                    personImage.on("click", imageClick);
 
                     $("#gifs-appear-here").prepend(gifDiv);
                   }
                 });
             });
+
+            $("#submit").on("click", function(e){
+              e.preventDefault();
+              var newItem = $("#text").val()
+              var newButton = $("<button data-person=''>")
+              newButton.attr("data-person", newItem);
+              newButton.html(newItem)
+              $("#buttons").append(newButton)
+
+              newButton.on("click", function() {
+              //below..this refers to the element that is clicked...we pulled the attribute data-person out
+              var person = $(this).attr("data-person");
+              //limit=10 limits it to 10 pics
+              var queryURL = "http://api.giphy.com/v1/gifs/search?q=" +
+                person + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+              $.ajax({
+                  url: queryURL,
+                  method: "GET"
+                })
+                .done(function(response) {
+                  var results = response.data;
+                  console.log(results);
+                  $("#gifs-appear-here").empty();
+                  stills = [];
+                  gifs = [];
+
+                  for (var i = 0; i < results.length; i++) {
+                      // Array.push(newItem) ---> push a newItem onto the end of Array
+                    stills.push(results[i].images.original_still.url);
+                    gifs.push(results[i].images.fixed_height.url);
+                    var gifDiv = $("<div class='item' data-state='still'>"); //
+
+                    var rating = results[i].rating;
+
+                    var p = $("<p>").text("Rating: " + rating);
+
+                    var personImage = $("<img>");
+                   // personImage.attr("src", results[i].images.fixed_height.url);
+                    personImage.attr("src", results[i].images.original_still.url);
+                      //prepend p tag and image to oridinal
+                    gifDiv.prepend(p);
+                    gifDiv.prepend(personImage);
+                    personImage.on("click", imageClick);
+
+                    $("#gifs-appear-here").prepend(gifDiv);
+                
+                  }
+                });
+            });
+            });
+
+            function imageClick(e){
+              var state = $(e.target).attr("data-state");
+              var currentSource = $(e.target).attr("src");
+              // first, find out whether this image is currently moving or not 
+             if (state == "still"){
+                // get the index of this src url in the stills array
+                // Array.indexOf(findItem) ---> finds the numeric index of findItem inside Array
+                var index = stills.indexOf(currentSource);
+                $(e.target).attr("src", gifs[index]);
+                $(e.target).attr("data-state", "moving")
+                // then reassign the src url to gifs[index]
+             }
+             else {
+              var index = gifs.indexOf(currentSource);
+                $(e.target).attr("src", stills[index]);
+                $(e.target).attr("data-state", "still");
+             }
+              // next, if moving, replace src with still image
+              // (or if still, replace src with moving gif)
+
+
+            }
           </script>
           </div>
 </body>
