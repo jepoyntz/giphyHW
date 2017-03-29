@@ -114,8 +114,8 @@
               var newItem = $("#text").val()
               var newButton = $("<button data-person=''>")
               newButton.attr("data-person", newItem);
-              newButton.html(newItem)
-              $("#buttons").append(newButton)
+              newButton.html(newItem);
+              $("#buttons").append(newButton);
 
               newButton.on("click", function() {
               //below..this refers to the element that is clicked...we pulled the attribute data-person out
